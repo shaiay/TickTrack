@@ -2,7 +2,6 @@ package com.theflopguyproductions.ticktrack.counter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -103,14 +102,15 @@ public class CounterData implements Comparable<CounterData>{
         timestamps.addTimestamp(Instant.ofEpochMilli(counterTimestamp));
     }
 
-    public Integer[] getAggregateCounts() {
-        int current_hour = LocalTime.now().getHour();
+    public Integer[] getAggregateCounts(long nowTimestamp) {
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(nowTimestamp),ZoneId.systemDefault());
+        int current_hour = now.getHour();
         LocalDateTime t0;
         if(current_hour>=resetHour) {
-            t0 = LocalDateTime.of(LocalDate.now(), LocalTime.of(resetHour, 0, 0));
+            t0 = LocalDateTime.of(now.toLocalDate(), LocalTime.of(resetHour, 0, 0));
         }
         else {
-            t0 = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(resetHour, 0, 0));
+            t0 = LocalDateTime.of(now.toLocalDate().minusDays(1), LocalTime.of(resetHour, 0, 0));
         }
         ZonedDateTime zt0 = t0.atZone(ZoneId.systemDefault());
         Map<Long, Integer> histogram = TimestampHistogram.createHistogram(
